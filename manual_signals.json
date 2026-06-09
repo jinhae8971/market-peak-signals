@@ -1,0 +1,28 @@
+{
+  "_readme": "BofA/Conference Board 독점 데이터 시그널. 월 1회 발표치 확인 후 triggered/as_of/note 갱신. 초기값은 BofA Exhibit 11의 May-26 컬럼 기준.",
+  "S1": {
+    "triggered": false,
+    "as_of": "2026-05",
+    "note": "CB Consumer Confidence — 110 미만"
+  },
+  "S2": {
+    "triggered": true,
+    "as_of": "2026-05",
+    "note": "CB 주가상승 기대 Net% > 20"
+  },
+  "S3": {
+    "triggered": false,
+    "as_of": "2026-05",
+    "note": "BofA SSI — Sell 신호 미발동"
+  },
+  "S4": {
+    "triggered": true,
+    "as_of": "2026-05",
+    "note": "LTG 5y Z > 1"
+  },
+  "S5": {
+    "triggered": true,
+    "as_of": "2026-05",
+    "note": "M&A 건수 10y Z > 1"
+  }
+}

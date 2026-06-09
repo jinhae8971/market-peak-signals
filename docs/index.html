@@ -3,175 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Market Peak Signals — Daily Monitor</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>Market Peak Signals</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-:root{
-  --paper:#FDFCFA; --ink:#13202E; --navy:#0F2A4A; --crimson:#B01E2E;
-  --rule:#D8D4CC; --muted:#6B7280; --amber:#B97A0F; --green:#2F6B3A;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--paper);color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
-  font-size:15px;line-height:1.55}
-.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
-.eyebrow{background:var(--navy);color:#E8EDF4;padding:10px 0}
-.eyebrow .wrap{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
-.eyebrow b{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.14em}
-.eyebrow span{font-size:12px;opacity:.75}
-.wrap{max-width:980px;margin:0 auto;padding:0 18px}
-header.note{border-left:6px solid var(--crimson);margin:28px 0 8px;padding-left:16px}
-header.note h1{font-family:"Source Serif 4",Georgia,serif;font-weight:700;font-size:clamp(22px,3.4vw,32px);line-height:1.25}
-header.note p{color:var(--muted);font-size:14px;margin-top:4px}
-.hero{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center;
-  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:22px 0;margin:18px 0}
-.gauge{display:flex;flex-direction:column;align-items:center}
-.gauge .pct{font-family:"Source Serif 4",Georgia,serif;font-weight:700;font-size:64px;line-height:1;color:var(--crimson)}
-.gauge .lbl{font-size:12px;color:var(--muted);letter-spacing:.08em;margin-top:6px}
-.meter{position:relative;height:14px;background:#EFECE6;border:1px solid var(--rule);margin:8px 0 4px}
-.meter .fill{position:absolute;inset:0 auto 0 0;background:var(--crimson)}
-.meter .th{position:absolute;top:-5px;bottom:-5px;left:70%;width:0;border-left:2px dashed var(--ink)}
-.meter-note{font-size:12px;color:var(--muted)}
-.stats{display:flex;gap:22px;flex-wrap:wrap;margin-top:12px}
-.stat .k{font-size:11px;letter-spacing:.1em;color:var(--muted)}
-.stat .v{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:17px}
-.badge{display:inline-block;padding:3px 10px;font-size:12px;font-weight:700;border:1.5px solid;letter-spacing:.05em}
-.b-red{color:var(--crimson);border-color:var(--crimson);background:#B01E2E12}
-.b-amber{color:var(--amber);border-color:var(--amber);background:#B97A0F12}
-.b-green{color:var(--green);border-color:var(--green);background:#2F6B3A12}
-h2{font-family:"Source Serif 4",Georgia,serif;font-size:18px;margin:30px 0 12px;display:flex;align-items:baseline;gap:10px}
-h2 small{font-family:inherit;font-weight:400;font-size:13px;color:var(--muted)}
-.chartbox{border:1px solid var(--rule);padding:14px;background:#fff}
-.chartbox canvas{max-height:340px}
-table.exhibit{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--rule)}
-table.exhibit th,table.exhibit td{padding:7px 9px;font-size:13px;border-bottom:1px solid #EFECE6}
-table.exhibit thead th{background:#F4F1EB;font-family:"IBM Plex Mono",monospace;font-size:11px;text-align:center;white-space:nowrap}
-table.exhibit thead th:first-child{text-align:left}
-table.exhibit td.sig{min-width:170px}
-table.exhibit td.sig .nm{font-weight:600}
-table.exhibit td.sig .vv{display:block;font-size:11.5px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
-table.exhibit td.c{text-align:center;font-size:15px}
-.chk{color:var(--crimson);font-weight:700}
-.cat-row td{background:var(--navy);color:#E8EDF4;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;padding:4px 9px}
-tr.total td{background:#EFECE6;font-weight:700;font-family:"IBM Plex Mono",monospace}
-.proxy-flag{color:var(--muted);font-weight:400}
-.tablewrap{overflow-x:auto}
-.foot{margin:34px 0 50px;border-top:1px solid var(--rule);padding-top:12px;font-size:12.5px;color:var(--muted)}
-.foot b{color:var(--ink)}
-@media(max-width:640px){.hero{grid-template-columns:1fr;gap:14px}.gauge{align-items:flex-start}.gauge .pct{font-size:52px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+  :root{
+    --bg:#0d1117; --panel:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e;
+    --red:#f85149; --orange:#d29922; --green:#3fb950; --blue:#58a6ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);
+    font-family:-apple-system,'Segoe UI','Noto Sans KR',sans-serif;
+    padding:24px;max-width:1100px;margin:0 auto}
+  h1{font-size:1.5rem;margin-bottom:4px}
+  .sub{color:var(--muted);font-size:.85rem;margin-bottom:24px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px}
+  .card .label{color:var(--muted);font-size:.78rem;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+  .card .value{font-size:1.7rem;font-weight:700}
+  .card .note{color:var(--muted);font-size:.75rem;margin-top:4px}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:24px}
+  .panel h2{font-size:1.05rem;margin-bottom:14px}
+  table{width:100%;border-collapse:collapse;font-size:.86rem}
+  th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--border)}
+  th{color:var(--muted);font-weight:600;font-size:.76rem;text-transform:uppercase}
+  .badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.74rem;font-weight:600}
+  .b-on{background:rgba(248,81,73,.15);color:var(--red)}
+  .b-off{background:rgba(63,185,80,.12);color:var(--green)}
+  .b-manual{background:rgba(88,166,255,.12);color:var(--blue)}
+  .b-auto{background:rgba(139,148,158,.15);color:var(--muted)}
+  .detail{color:var(--muted);font-size:.78rem}
+  .heat td{text-align:center;font-size:.9rem;padding:7px 4px}
+  .heat .sig-name{text-align:left;font-size:.78rem;color:var(--muted);white-space:nowrap}
+  .dot-on{color:var(--red)} .dot-off{color:#2d333b}
+  #status{color:var(--muted);font-size:.8rem}
+  footer{color:var(--muted);font-size:.75rem;margin-top:8px;line-height:1.6}
+  @media(max-width:640px){body{padding:14px}.card .value{font-size:1.3rem}}
 </style>
 </head>
 <body>
-<div class="eyebrow"><div class="wrap">
-  <b>MARKET PEAK SIGNALS · DAILY MONITOR</b>
-  <span class="mono" id="updated">loading…</span>
-</div></div>
-<div class="wrap">
-  <header class="note">
-    <h1>시장 고점 시그널 — <span id="hdr-pct" style="color:var(--crimson)">–%</span> 점등</h1>
-    <p>BofA Exhibit 11 방법론 기반 10개 시그널 · 과거 7회 고점에서 평균 70% 점등</p>
-  </header>
+  <h1>&#128202; Market Peak Signals</h1>
+  <div class="sub">BofA Exhibit 11 — 시장 피크 시그널 일일 모니터 (피크 평균 트리거율 ~70%)</div>
 
-  <section class="hero">
-    <div class="gauge">
-      <div class="pct mono" id="big-pct">–</div>
-      <div class="lbl">% TRIGGERED</div>
-    </div>
-    <div>
-      <span class="badge" id="badge">–</span>
-      <div class="meter"><div class="fill" id="fill" style="width:0%"></div><div class="th"></div></div>
-      <div class="meter-note">점선 = 과거 고점 평균(70%)</div>
-      <div class="stats">
-        <div class="stat"><div class="k">S&amp;P 500</div><div class="v" id="spx">–</div></div>
-        <div class="stat"><div class="k">트리거</div><div class="v" id="trig">–</div></div>
-        <div class="stat"><div class="k">전일 대비</div><div class="v" id="delta">–</div></div>
-      </div>
-    </div>
-  </section>
-
-  <h2>추세 <small>% 점등(좌) · S&amp;P 500(우)</small></h2>
-  <div class="chartbox"><canvas id="trend"></canvas></div>
-
-  <h2>시그널 익시빗 <small>최근 표시 — ✓ 트리거 · ≈ 프록시 · ⊘ 수동</small></h2>
-  <div class="tablewrap"><table class="exhibit" id="exhibit"></table></div>
-
-  <div class="foot">
-    <b>방법론.</b> Sentiment/Valuation/Macro 10개 시그널 중 7개는 무료 공개데이터로 자동 계산(FRED·Yahoo·CNN F&amp;G·multpl·BLS·Shiller),
-    3개(BofA Sell Side·LTG·M&amp;A)는 BofA 독점 데이터로 <span class="mono">manual_overrides.json</span> 수동 관리.
-    ≈ 표기는 원지표 대용 프록시: 소비자신뢰(CB CCI→UMich), 주가기대(CB Net%→CNN F&amp;G), 크레딧(BofA CSI→HY OAS 백분위).
-    수집 실패 시 직전 값 유지. 본 자료는 투자 권유가 아닌 참고용 지표 모니터입니다.
-    <br>Source: 자체 산출 (BofA US Equity &amp; Quant Strategy Exhibit 11 방법론 참조)
+  <div class="grid">
+    <div class="card"><div class="label">Triggered</div><div class="value" id="kpi-pct">—</div><div class="note" id="kpi-count"></div></div>
+    <div class="card"><div class="label">판정</div><div class="value" id="kpi-verdict" style="font-size:1.15rem">—</div><div class="note">피크 평균 70% 기준</div></div>
+    <div class="card"><div class="label">최근 변화</div><div class="value" id="kpi-delta">—</div><div class="note" id="kpi-delta-note"></div></div>
+    <div class="card"><div class="label">업데이트</div><div class="value" id="kpi-date" style="font-size:1.15rem">—</div><div class="note">매일 07:30 KST</div></div>
   </div>
-</div>
+
+  <div class="panel">
+    <h2>트리거 비율 추세</h2>
+    <canvas id="trend" height="110"></canvas>
+  </div>
+
+  <div class="panel">
+    <h2>현재 시그널 상태</h2>
+    <table id="sig-table">
+      <thead><tr><th>#</th><th>시그널</th><th>분류</th><th>상태</th><th>방식</th><th>세부</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>시그널 히트맵 (최근 30회)</h2>
+    <div style="overflow-x:auto"><table class="heat" id="heatmap"></table></div>
+  </div>
+
+  <div id="status"></div>
+  <footer>
+    수동 시그널(S1–S5)은 BofA/Conference Board 발표 기준 월 1회 갱신 · 자동 시그널(S6–S10)은 FRED/시장 데이터 프록시 기반.<br>
+    S7=IVE vs IVW 프록시 · S9=HY OAS 10y 백분위 프록시. 본 대시보드는 정보 제공 목적입니다.
+  </footer>
 
 <script>
-const ORDER = ["consumer_confidence","stocks_higher","sell_side","ltg","mna",
-               "pe_cpi","low_pe_underperf","yield_curve","credit_stress","sloos"];
-const CATS = {Sentiment:["consumer_confidence","stocks_higher","sell_side","ltg","mna"],
-              Valuation:["pe_cpi","low_pe_underperf"],
-              Macro:["yield_curve","credit_stress","sloos"]};
+const META = {
+  S1:["CB 소비자신뢰지수 > 110","Sentiment","manual"],
+  S2:["CB 주가상승 기대 Net% > 20","Sentiment","manual"],
+  S3:["BofA Sell Side Indicator 'Sell'","Sentiment","manual"],
+  S4:["S&P500 LTG 5y Z > 1","Sentiment","manual"],
+  S5:["M&A 건수 10y Z > 1","Sentiment","manual"],
+  S6:["PE+CPI 10y Z > 1","Valuation","auto"],
+  S7:["Low PE 6m -2.5ppt 언더퍼폼","Valuation","auto"],
+  S8:["금리역전 (최근 6m)","Macro","auto"],
+  S9:["Credit Stress < 0.25","Macro","auto"],
+  S10:["SLOOS 대출태도 긴축","Macro","auto"],
+};
+const ORDER = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10"];
 
-fetch("./data/history.json?t="+Date.now()).then(r=>r.json()).then(hist=>{
-  const cur = hist[hist.length-1], prev = hist[hist.length-2];
-  document.getElementById("updated").textContent = "as of "+cur.date+" KST";
-  document.getElementById("hdr-pct").textContent = cur.pct+"%";
-  document.getElementById("big-pct").textContent = cur.pct;
-  document.getElementById("fill").style.width = Math.min(cur.pct,100)+"%";
-  document.getElementById("spx").textContent = cur.sp500? cur.sp500.toLocaleString():"–";
-  document.getElementById("trig").textContent = cur.n_trig+"/"+cur.n_total+" (판정 "+cur.n_known+")";
-  document.getElementById("delta").textContent = prev? (cur.pct-prev.pct>0?"+":"")+(cur.pct-prev.pct)+"%p" : "–";
-  const b = document.getElementById("badge");
-  if(cur.pct>=70){b.textContent="🔴 피크 경보 — 고점 평균 도달";b.className="badge b-red";}
-  else if(cur.pct>=50){b.textContent="🟠 주의 — 시그널 누적";b.className="badge b-amber";}
-  else if(cur.pct>=30){b.textContent="🟡 관찰 — 일부 점등";b.className="badge b-amber";}
-  else{b.textContent="🟢 안정";b.className="badge b-green";}
+fetch("data/history.json?cb=" + Date.now())
+  .then(r => r.json())
+  .then(render)
+  .catch(e => document.getElementById("status").textContent = "데이터 로드 실패: " + e);
 
-  // ---- trend chart
-  new Chart(document.getElementById("trend"),{
-    type:"line",
-    data:{labels:hist.map(h=>h.date),datasets:[
-      {label:"% triggered",data:hist.map(h=>h.pct),yAxisID:"y",
-       borderColor:"#B01E2E",backgroundColor:"#B01E2E22",borderWidth:2,pointRadius:hist.length>60?0:2,fill:true,tension:.25},
-      {label:"S&P 500",data:hist.map(h=>h.sp500),yAxisID:"y2",
-       borderColor:"#6B7280",borderWidth:1.5,pointRadius:0,tension:.25},
-      {label:"고점 평균 70%",data:hist.map(_=>70),yAxisID:"y",
-       borderColor:"#13202E",borderDash:[6,4],borderWidth:1.2,pointRadius:0}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},
-      plugins:{legend:{labels:{font:{family:"IBM Plex Mono",size:11}}}},
-      scales:{y:{min:0,max:100,ticks:{callback:v=>v+"%",font:{family:"IBM Plex Mono",size:11}}},
-              y2:{position:"right",grid:{drawOnChartArea:false},ticks:{font:{family:"IBM Plex Mono",size:11}}},
-              x:{ticks:{maxTicksLimit:8,font:{family:"IBM Plex Mono",size:10}}}}}
+function render(hist){
+  if(!hist.length) return;
+  const latest = hist[hist.length-1];
+  const prev = hist.length > 1 ? hist[hist.length-2] : null;
+
+  document.getElementById("kpi-pct").textContent = latest.pct_triggered + "%";
+  const n = Object.values(latest.signals).filter(Boolean).length;
+  document.getElementById("kpi-count").textContent = n + " / 10 signals";
+  const v = document.getElementById("kpi-verdict");
+  if(latest.pct_triggered >= 70){ v.textContent = "\uD83D\uDD34 피크 경보"; v.style.color = "var(--red)"; }
+  else if(latest.pct_triggered >= 50){ v.textContent = "\uD83D\uDFE0 주의"; v.style.color = "var(--orange)"; }
+  else { v.textContent = "\uD83D\uDFE2 안정"; v.style.color = "var(--green)"; }
+  if(prev){
+    const d = latest.pct_triggered - prev.pct_triggered;
+    document.getElementById("kpi-delta").textContent = (d>0?"+":"") + d + "pp";
+    document.getElementById("kpi-delta-note").textContent = "vs " + prev.date;
+  }
+  document.getElementById("kpi-date").textContent = latest.date;
+
+  new Chart(document.getElementById("trend"), {
+    type: "line",
+    data: {
+      labels: hist.map(h=>h.date),
+      datasets: [
+        {
+          label: "% triggered",
+          data: hist.map(h=>h.pct_triggered),
+          borderColor: "#58a6ff", backgroundColor: "rgba(88,166,255,.12)",
+          fill: true, tension: .25, pointRadius: 3,
+        },
+        {
+          label: "피크 평균 (70%)",
+          data: hist.map(()=>70),
+          borderColor: "rgba(248,81,73,.55)", borderDash: [6,5],
+          pointRadius: 0, fill: false,
+        }
+      ]
+    },
+    options: {
+      plugins: { legend: { labels:{color:"#8b949e"} } },
+      scales: {
+        y: { min:0, max:100, ticks:{color:"#8b949e", callback:v=>v+"%"}, grid:{color:"#21262d"} },
+        x: { ticks:{color:"#8b949e", maxTicksLimit:12}, grid:{display:false} }
+      }
+    }
   });
 
-  // ---- exhibit table (최근 최대 10개 표시일, 주 단위 솎아내기)
-  let cols = hist.slice();
-  if(cols.length>10){const step=Math.ceil(cols.length/10);
-    cols = hist.filter((_,i)=> (hist.length-1-i)%step===0 );}
-  cols = cols.slice(-10);
-  const tbl = document.getElementById("exhibit");
-  let html = "<thead><tr><th>Signpost</th>"+cols.map(c=>"<th>"+c.date.slice(5)+"</th>").join("")+"</tr></thead><tbody>";
-  for(const [cat,ids] of Object.entries(CATS)){
-    html += `<tr class="cat-row"><td colspan="${cols.length+1}">${cat.toUpperCase()}</td></tr>`;
-    for(const id of ids){
-      const s = cur.signals[id]; if(!s) continue;
-      const flag = s.src==="manual" ? " ⊘" : (s.proxy ? " ≈" : "");
-      html += `<tr><td class="sig"><span class="nm">${s.name}<span class="proxy-flag">${flag}</span></span><span class="vv">${s.v}</span></td>`;
-      html += cols.map(c=>{
-        const t = c.signals[id] ? c.signals[id].t : null;
-        return `<td class="c">${t===true?'<span class="chk">✓</span>':(t===false?'':'<span style="color:#B9B4AA">·</span>')}</td>`;
-      }).join("")+"</tr>";
-    }
-  }
-  html += `<tr class="total"><td>% triggered</td>${cols.map(c=>`<td class="c">${c.pct}%</td>`).join("")}</tr>`;
-  html += `<tr class="total"><td>S&amp;P 500</td>${cols.map(c=>`<td class="c">${c.sp500?Math.round(c.sp500).toLocaleString():"–"}</td>`).join("")}</tr>`;
-  tbl.innerHTML = html+"</tbody>";
-}).catch(e=>{
-  document.getElementById("updated").textContent="데이터 로드 실패 — Actions 첫 실행 후 생성됩니다";
-});
+  const tbody = document.querySelector("#sig-table tbody");
+  ORDER.forEach(id=>{
+    const on = latest.signals[id];
+    const [name,cat,mode] = META[id];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${id}</td><td>${name}</td><td>${cat}</td>
+      <td><span class="badge ${on?"b-on":"b-off"}">${on?"TRIGGERED":"—"}</span></td>
+      <td><span class="badge ${mode==="manual"?"b-manual":"b-auto"}">${mode==="manual"?"수동 \u270D\uFE0F":"자동"}</span></td>
+      <td class="detail">${(latest.details && latest.details[id]) || ""}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  const recent = hist.slice(-30);
+  const hm = document.getElementById("heatmap");
+  let head = "<tr><th class='sig-name'>Signal</th>" +
+    recent.map(h=>`<th style="font-size:.62rem;color:var(--muted)">${h.date.slice(5)}</th>`).join("") + "</tr>";
+  let rows = ORDER.map(id=>{
+    return "<tr><td class='sig-name'>" + id + " " + META[id][0] + "</td>" +
+      recent.map(h=>{
+        const on = h.signals && h.signals[id];
+        return `<td class="${on?"dot-on":"dot-off"}">\u25CF</td>`;
+      }).join("") + "</tr>";
+  }).join("");
+  hm.innerHTML = head + rows;
+}
 </script>
 </body>
 </html>

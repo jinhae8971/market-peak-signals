@@ -1,0 +1,86 @@
+[
+ {
+  "date": "2026-03-31",
+  "pct_triggered": 40,
+  "signals": {
+   "S1": false,
+   "S2": true,
+   "S3": false,
+   "S4": false,
+   "S5": true,
+   "S6": false,
+   "S7": false,
+   "S8": false,
+   "S9": true,
+   "S10": true
+  },
+  "details": {
+   "S1": "BofA Exhibit 11 seed",
+   "S2": "BofA Exhibit 11 seed",
+   "S3": "BofA Exhibit 11 seed",
+   "S4": "BofA Exhibit 11 seed",
+   "S5": "BofA Exhibit 11 seed",
+   "S6": "BofA Exhibit 11 seed",
+   "S7": "BofA Exhibit 11 seed",
+   "S8": "BofA Exhibit 11 seed",
+   "S9": "BofA Exhibit 11 seed",
+   "S10": "BofA Exhibit 11 seed"
+  }
+ },
+ {
+  "date": "2026-04-30",
+  "pct_triggered": 50,
+  "signals": {
+   "S1": false,
+   "S2": true,
+   "S3": false,
+   "S4": false,
+   "S5": true,
+   "S6": true,
+   "S7": false,
+   "S8": false,
+   "S9": true,
+   "S10": true
+  },
+  "details": {
+   "S1": "BofA Exhibit 11 seed",
+   "S2": "BofA Exhibit 11 seed",
+   "S3": "BofA Exhibit 11 seed",
+   "S4": "BofA Exhibit 11 seed",
+   "S5": "BofA Exhibit 11 seed",
+   "S6": "BofA Exhibit 11 seed",
+   "S7": "BofA Exhibit 11 seed",
+   "S8": "BofA Exhibit 11 seed",
+   "S9": "BofA Exhibit 11 seed",
+   "S10": "BofA Exhibit 11 seed"
+  }
+ },
+ {
+  "date": "2026-05-31",
+  "pct_triggered": 70,
+  "signals": {
+   "S1": false,
+   "S2": true,
+   "S3": false,
+   "S4": true,
+   "S5": true,
+   "S6": true,
+   "S7": true,
+   "S8": false,
+   "S9": true,
+   "S10": true
+  },
+  "details": {
+   "S1": "BofA Exhibit 11 seed",
+   "S2": "BofA Exhibit 11 seed",
+   "S3": "BofA Exhibit 11 seed",
+   "S4": "BofA Exhibit 11 seed",
+   "S5": "BofA Exhibit 11 seed",
+   "S6": "BofA Exhibit 11 seed",
+   "S7": "BofA Exhibit 11 seed",
+   "S8": "BofA Exhibit 11 seed",
+   "S9": "BofA Exhibit 11 seed",
+   "S10": "BofA Exhibit 11 seed"
+  }
+ }
+]

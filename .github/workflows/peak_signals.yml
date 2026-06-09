@@ -1,4 +1,4 @@
-name: market-peak-signals-daily
+name: Market Peak Signals Daily
 
 on:
   schedule:
@@ -7,10 +7,6 @@ on:
 
 permissions:
   contents: write
-
-concurrency:
-  group: peak-signals
-  cancel-in-progress: false
 
 jobs:
   run:
@@ -26,20 +22,19 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - name: Compute signals & notify
+      - name: Run peak signals monitor
         env:
           TELEGRAM_TOKEN:   ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TZ: "Asia/Seoul"
-        run: python signals.py
+        run: python peak_signals.py
 
-      - name: Commit history
+      - name: Commit dashboard data
         run: |
-          git config user.name  "github-actions[bot]"
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/data/history.json
-          git diff --cached --quiet || git commit -m "data: $(date +'%Y-%m-%d') signals"
-          git pull --rebase origin main || true
+          git diff --cached --quiet || git commit -m "data: update $(date +'%Y-%m-%d')"
           git push
 
       - name: Notify failure
@@ -48,11 +43,11 @@ jobs:
           TELEGRAM_TOKEN:   ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python - <<'EOF'
+          python - <<'PYEOF'
           import os, requests
           requests.post(
               f"https://api.telegram.org/bot{os.environ['TELEGRAM_TOKEN']}/sendMessage",
               json={"chat_id": os.environ["TELEGRAM_CHAT_ID"],
-                    "text": "❌ market-peak-signals 실행 실패! Actions 로그 확인\nhttps://github.com/jinhae8971/market-peak-signals/actions"},
+                    "text": "❌ Market Peak Signals 실행 실패! GitHub Actions 로그 확인"},
               timeout=10)
-          EOF
+          PYEOF
