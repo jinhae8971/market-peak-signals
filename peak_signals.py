@@ -239,6 +239,11 @@ def update_history(date_str: str, pct: int, results: list) -> list:
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(HISTORY_PATH, "w", encoding="utf-8") as f:
         json.dump(hist, f, ensure_ascii=False, indent=1)
+    # 오케스트레이터 신선도 체크용 latest.json (generated_at 필수)
+    latest = {"generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+              **hist[-1]}
+    with open(os.path.join(DATA_DIR, "latest.json"), "w", encoding="utf-8") as f:
+        json.dump(latest, f, ensure_ascii=False, indent=1)
     return hist
 
 
