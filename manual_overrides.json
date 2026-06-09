@@ -1,0 +1,6 @@
+{
+  "_comment": "BofA 독점 데이터 시그널 수동 관리. BofA 리포트/뉴스 확인 후 triggered/as_of 갱신.",
+  "sell_side": {"triggered": false, "as_of": "2026-05", "note": "BofA Sell Side Indicator 'Sell' 미발동 (Exhibit 11 May-26)"},
+  "ltg":       {"triggered": true,  "as_of": "2026-05", "note": "S&P500 LTG 5yr Z>1 발동 (Exhibit 11 May-26)"},
+  "mna":       {"triggered": true,  "as_of": "2026-05", "note": "M&A deals 10yr Z>1 발동 (Exhibit 11 May-26)"}
+}

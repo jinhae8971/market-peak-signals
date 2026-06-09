@@ -1,0 +1,58 @@
+name: market-peak-signals-daily
+
+on:
+  schedule:
+    - cron: "30 22 * * *"   # 매일 07:30 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: peak-signals
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - run: pip install -r requirements.txt
+
+      - name: Compute signals & notify
+        env:
+          TELEGRAM_TOKEN:   ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TZ: "Asia/Seoul"
+        run: python signals.py
+
+      - name: Commit history
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/data/history.json
+          git diff --cached --quiet || git commit -m "data: $(date +'%Y-%m-%d') signals"
+          git pull --rebase origin main || true
+          git push
+
+      - name: Notify failure
+        if: failure()
+        env:
+          TELEGRAM_TOKEN:   ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python - <<'EOF'
+          import os, requests
+          requests.post(
+              f"https://api.telegram.org/bot{os.environ['TELEGRAM_TOKEN']}/sendMessage",
+              json={"chat_id": os.environ["TELEGRAM_CHAT_ID"],
+                    "text": "❌ market-peak-signals 실행 실패! Actions 로그 확인\nhttps://github.com/jinhae8971/market-peak-signals/actions"},
+              timeout=10)
+          EOF
