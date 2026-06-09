@@ -14,11 +14,11 @@ BofA Exhibit 11("List of signals to watch for a market peak") 기반 시장 피�
 | S3 | BofA Sell Side Indicator 'Sell' | 수동 | BofA (월간, 언론 보도) |
 | S4 | S&P500 LTG 5y Z > 1 | 수동 | BofA/IBES |
 | S5 | M&A 건수 10y Z > 1 | 수동 | BofA |
-| S6 | trailing PE + YoY CPI 10y Z > 1 | 자동 | multpl + FRED CPIAUCSL |
+| S6 | trailing PE + YoY CPI 10y Z > 1 | 자동 | multpl PE + BLS CPI API |
 | S7 | Low PE 6m -2.5ppt 언더퍼폼 | 자동 | IVE vs IVW (프록시) |
-| S8 | 금리역전 (최근 6m) | 자동 | FRED T10Y3M |
-| S9 | Credit Stress < 0.25 | 자동 | FRED HY OAS 10y 백분위 (프록시) |
-| S10 | SLOOS 대출태도 긴축 | 자동 | FRED DRTSCILM |
+| S8 | 금리역전 (최근 6m) | 자동 | Yahoo ^TNX − ^IRX |
+| S9 | Credit Stress < 0.25 | 자동 | HYG/LQD 10y 백분위 (프록시) |
+| S10 | SLOOS 대출태도 긴축 | 자동 | FRED DRTSCILM (차단 시 manual S10 폴백) |
 
 ## 수동 시그널 갱신
 

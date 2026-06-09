@@ -24,5 +24,10 @@
     "triggered": true,
     "as_of": "2026-05",
     "note": "M&A 건수 10y Z > 1"
+  },
+  "S10": {
+    "triggered": true,
+    "as_of": "2026-04",
+    "note": "SLOOS Net% 긴축 — FRED 차단 시 폴백 (분기 갱신)"
   }
 }

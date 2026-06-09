@@ -9,7 +9,7 @@ BofA Exhibit 11 기반 10개 시장 피크 시그널 일일 점검
 import os
 import io
 import json
-import math
+import html as _html
 import datetime as dt
 
 import requests
@@ -40,21 +40,11 @@ def load_config() -> dict:
 
 
 def fred_series(series_id: str, years: int = 12) -> pd.Series:
-    """FRED CSV 엔드포인트 (API key 불필요), 503 대비 지수 백오프 재시도"""
-    import time
+    """FRED CSV (GH 러너에서 차단될 수 있어 폴백 전용, 1회/20s)"""
     start = (dt.date.today() - dt.timedelta(days=365 * years)).isoformat()
     url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}&cosd={start}"
-    last_err = None
-    for attempt in range(4):
-        try:
-            r = requests.get(url, headers=UA, timeout=30)
-            r.raise_for_status()
-            break
-        except Exception as e:
-            last_err = e
-            time.sleep(2 ** attempt * 3)
-    else:
-        raise last_err
+    r = requests.get(url, headers=UA, timeout=20)
+    r.raise_for_status()
     df = pd.read_csv(io.StringIO(r.text))
     df.columns = ["date", "value"]
     df["date"] = pd.to_datetime(df["date"])
@@ -62,9 +52,31 @@ def fred_series(series_id: str, years: int = 12) -> pd.Series:
     return df.dropna().set_index("date")["value"]
 
 
+def bls_cpi_yoy() -> float:
+    """BLS API v2 (key 불필요) — CPI-U YoY %"""
+    yr = dt.date.today().year
+    r = requests.post("https://api.bls.gov/publicAPI/v2/timeseries/data/",
+                      json={"seriesid": ["CUUR0000SA0"],
+                            "startyear": str(yr - 2), "endyear": str(yr)},
+                      timeout=30)
+    r.raise_for_status()
+    data = r.json()["Results"]["series"][0]["data"]
+    vals = {}
+    for d in data:
+        if not d["period"].startswith("M"):
+            continue
+        try:
+            vals[f"{d['year']}-{d['period'][1:]}"] = float(d["value"])
+        except ValueError:
+            continue  # 예비치 "-" 등 스킵
+    s = pd.Series(vals).sort_index()
+    return float(s.iloc[-1] / s.iloc[-13] * 100 - 100)
+
+
 def yahoo_closes(symbol: str, months: int = 8) -> pd.Series:
     import yfinance as yf
-    df = yf.download(symbol, period=f"{months}mo", interval="1d",
+    period = "max" if months > 24 else f"{months}mo"
+    df = yf.download(symbol, period=period, interval="1d",
                      progress=False, auto_adjust=True)
     if df.empty:
         raise RuntimeError(f"yfinance empty: {symbol}")
@@ -92,15 +104,16 @@ def multpl_pe_history() -> pd.Series:
 def sig_pe_cpi_z() -> dict:
     """S6: 10yr Z score of (trailing PE + YoY CPI) > 1"""
     pe = multpl_pe_history()
-    cpi = fred_series("CPIAUCSL", years=12)
-    cpi_yoy = cpi.pct_change(12) * 100
-    pe_m = pe.resample("MS").last()
-    combo = (pe_m + cpi_yoy.reindex(pe_m.index, method="nearest")).dropna()
-    window = combo[combo.index >= combo.index.max() - pd.DateOffset(years=10)]
-    z = (window.iloc[-1] - window.mean()) / window.std()
+    pe_m = pe.resample("MS").last().dropna()
+    window = pe_m[pe_m.index >= pe_m.index.max() - pd.DateOffset(years=10)]
+    cpi_yoy = bls_cpi_yoy()
+    # 과거 CPI 시계열 없이도 보수적으로: PE Z + 현재 CPI 기여 (10y CPI 평균 ~2.8% 가정 대비)
+    combo_now = window.iloc[-1] + cpi_yoy
+    combo_hist = window + 2.8
+    z = (combo_now - combo_hist.mean()) / combo_hist.std()
     return {
         "triggered": bool(z > 1),
-        "value": f"Z={z:.2f} (PE {pe_m.iloc[-1]:.1f} + CPI {cpi_yoy.dropna().iloc[-1]:.1f}%)",
+        "value": f"Z={z:.2f} (PE {window.iloc[-1]:.1f} + CPI {cpi_yoy:.1f}%)",
     }
 
 
@@ -119,34 +132,48 @@ def sig_value_vs_growth() -> dict:
 
 
 def sig_yield_curve() -> dict:
-    """S8: 최근 6개월 내 10Y-3M 역전 발생 여부"""
-    s = fred_series("T10Y3M", years=2)
-    recent = s[s.index >= s.index.max() - pd.DateOffset(months=6)]
-    inverted = bool((recent < 0).any())
+    """S8: 최근 6개월 내 10Y-3M 역전 (Yahoo ^TNX - ^IRX)"""
+    tnx = yahoo_closes("^TNX", months=8)
+    irx = yahoo_closes("^IRX", months=8)
+    df = pd.concat([tnx, irx], axis=1, keys=["t", "i"], sort=False).dropna()
+    spread = df["t"] - df["i"]
+    recent = spread[spread.index >= spread.index.max() - pd.DateOffset(months=6)]
     return {
-        "triggered": inverted,
-        "value": f"10Y-3M now {s.iloc[-1]:+.2f}%, 6m min {recent.min():+.2f}%",
+        "triggered": bool((recent < 0).any()),
+        "value": f"10Y-3M now {spread.iloc[-1]:+.2f}%, 6m min {recent.min():+.2f}%",
     }
 
 
 def sig_credit_stress() -> dict:
-    """S9: Credit Stress 프록시 — HY OAS 10년 백분위 < 0.25 (스프레드 과열 압축)"""
-    s = fred_series("BAMLH0A0HYM2", years=10)
-    pct = float((s < s.iloc[-1]).mean())
+    """S9: Credit Stress 프록시 — 1 - pct(HYG/LQD, 10y) < 0.25 (스프레드 과열 압축)"""
+    hyg = yahoo_closes("HYG", months=120)
+    lqd = yahoo_closes("LQD", months=120)
+    ratio = (pd.concat([hyg, lqd], axis=1, keys=["h", "l"], sort=False).dropna()
+               .pipe(lambda d: d["h"] / d["l"]))
+    ratio = ratio[ratio.index >= ratio.index.max() - pd.DateOffset(years=10)]
+    pct = float((ratio < ratio.iloc[-1]).mean())
+    stress = 1 - pct
     return {
-        "triggered": bool(pct < 0.25),
-        "value": f"HY OAS {s.iloc[-1]:.2f}%, 10y pct {pct:.2f}",
+        "triggered": bool(stress < 0.25),
+        "value": f"HYG/LQD {ratio.iloc[-1]:.4f}, stress proxy {stress:.2f}",
     }
 
 
 def sig_sloos() -> dict:
-    """S10: SLOOS 대출태도 긴축 (Net % > 0, 분기)"""
-    s = fred_series("DRTSCILM", years=5)
-    latest = float(s.iloc[-1])
-    return {
-        "triggered": bool(latest > 0),
-        "value": f"Net tightening {latest:+.1f}% ({s.index[-1]:%Y-%m})",
-    }
+    """S10: SLOOS 긴축 (FRED 1회 시도 → manual_signals.json S10 폴백, 분기 갱신)"""
+    try:
+        s = fred_series("DRTSCILM", years=5)
+        latest = float(s.iloc[-1])
+        return {"triggered": bool(latest > 0),
+                "value": f"Net tightening {latest:+.1f}% ({s.index[-1]:%Y-%m})"}
+    except Exception:
+        manual = {}
+        if os.path.exists(MANUAL_PATH):
+            with open(MANUAL_PATH, "r", encoding="utf-8") as f:
+                manual = json.load(f)
+        m = manual.get("S10", {})
+        return {"triggered": bool(m.get("triggered", False)),
+                "value": f"manual fallback (as of {m.get('as_of', '?')})"}
 
 
 AUTO_SIGNALS = [
@@ -241,11 +268,11 @@ def build_message(date_str: str, results: list, pct: int) -> str:
             cat_prev = r["category"]
         mark = "🔺" if r["triggered"] else ("⚠️" if r["error"] else "▫️")
         tag = "" if r["mode"] == "auto" else " ✍️"
-        lines.append(f"{mark} {r['name']}{tag}")
+        lines.append(f"{mark} {_html.escape(r['name'])}{tag}")
         if r["value"] and not r["error"]:
-            lines.append(f"    <i>{r['value']}</i>")
+            lines.append(f"    <i>{_html.escape(r['value'])}</i>")
         elif r["error"]:
-            lines.append(f"    <i>{r['value'][:80]}</i>")
+            lines.append(f"    <i>{_html.escape(r['value'][:80])}</i>")
     lines += [
         "",
         f"기준: BofA Exhibit 11 (피크 평균 ~{PEAK_AVG}%)",
