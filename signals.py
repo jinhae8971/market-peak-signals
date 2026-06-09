@@ -315,15 +315,16 @@ def main():
     delta = f" (전일 {prev_pct}%→)" if prev_pct is not None and prev_pct != pct else ""
 
     mark = lambda t: "✅" if t is True else ("➖" if t is False else "❔")
+    esc = lambda s: str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     lines = [f"{level} <b>마켓 피크 시그널 {pct}%</b>{delta}",
-             f"<i>{head} · 트리거 {n_trig}/{len(signals)} (판정가능 {len(known)})</i>",
+             f"<i>{esc(head)} · 트리거 {n_trig}/{len(signals)} (판정가능 {len(known)})</i>",
              f"S&amp;P 500: {entry['sp500']:,}" if entry["sp500"] else "", ""]
     order = ["consumer_confidence", "stocks_higher", "sell_side", "ltg", "mna",
              "pe_cpi", "low_pe_underperf", "yield_curve", "credit_stress", "sloos"]
     for sid in order:
         s = signals[sid]
         px = "≈" if s.get("proxy") else ""
-        lines.append(f"{mark(s['t'])} {px}{s['name']} — {s['v']}")
+        lines.append(f"{mark(s['t'])} {px}{esc(s['name'])} — {esc(s['v'])}")
     lines += ["", "기준: 과거 7회 고점 평균 트리거 70%",
               "📊 대시보드: https://jinhae8971.github.io/market-peak-signals/"]
     if errors:
@@ -331,9 +332,14 @@ def main():
     msg = "\n".join(l for l in lines if l is not None)
 
     if tg_token and tg_chat:
-        r = requests.post(f"https://api.telegram.org/bot{tg_token}/sendMessage",
-                          json={"chat_id": tg_chat, "text": msg, "parse_mode": "HTML"},
-                          timeout=20)
+        api = f"https://api.telegram.org/bot{tg_token}/sendMessage"
+        r = requests.post(api, json={"chat_id": tg_chat, "text": msg,
+                                     "parse_mode": "HTML"}, timeout=20)
+        if r.status_code != 200:
+            # HTML 파싱 오류 등 → 플레인텍스트 폴백
+            import re as _re
+            plain = _re.sub(r"<[^>]+>", "", msg).replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
+            r = requests.post(api, json={"chat_id": tg_chat, "text": plain}, timeout=20)
         r.raise_for_status()
         print("Telegram sent.")
     else:
