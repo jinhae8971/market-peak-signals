@@ -1,5 +1,5 @@
 {
-  "_readme": "BofA/Conference Board 독점 데이터 시그널. 월 1회 발표치 확인 후 triggered/as_of/note 갱신. 초기값은 BofA Exhibit 11의 May-26 컬럼 기준.",
+  "_readme": "BofA/Conference Board 독점 데이터 시그널. 월 1회 발표치 확인 후 triggered/as_of/note 갱신. 초기값은 BofA Exhibit 11의 May-26 컬럼 기준. BB는 핵심 10개와 독립된 Bull&Bear 센티먼트 오버레이(value 0~10).",
   "S1": {
     "triggered": false,
     "as_of": "2026-05",
@@ -29,5 +29,11 @@
     "triggered": true,
     "as_of": "2026-04",
     "note": "SLOOS Net% 긴축 — FRED 차단 시 폴백 (분기 갱신)"
+  },
+  "BB": {
+    "value": 9.2,
+    "prev": 8.9,
+    "as_of": "2026-06",
+    "note": "BofA Bull & Bear Indicator — BofA Global Investment Strategy 발표치 월 1회 갱신 (>=8 Sell / <=2 Buy)"
   }
 }

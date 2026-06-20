@@ -22,6 +22,8 @@ MANUAL_PATH = os.path.join(BASE_DIR, "manual_signals.json")
 
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) peak-signals/1.0"}
 PEAK_AVG = 70  # 과거 피크 평균 트리거 비율 (%)
+BB_SELL = 8.0  # Bull & Bear >= 8 -> 컨트래리안 Sell (극단적 낙관)
+BB_BUY = 2.0   # Bull & Bear <= 2 -> 컨트래리안 Buy (극단적 비관)
 
 
 # ---------------------------------------------------------------- utils
@@ -193,6 +195,33 @@ MANUAL_META = [
 ]
 
 
+def eval_bull_bear():
+    """BofA Bull & Bear Indicator 택티컬 오버레이 (manual_signals.json 'BB').
+    핵심 10개 구조 스코어와 독립 운용해 Exhibit 11의 피크 평균(70%) 캘리브레이션을 보존한다."""
+    manual = {}
+    if os.path.exists(MANUAL_PATH):
+        with open(MANUAL_PATH, "r", encoding="utf-8") as f:
+            manual = json.load(f)
+    bb = manual.get("BB")
+    if not bb or bb.get("value") is None:
+        return None
+    val = float(bb["value"])
+    prev = bb.get("prev")
+    if val >= BB_SELL:
+        status, emoji, label = "SELL", "🔴", "컨트래리안 매도 (극단적 낙관)"
+    elif val <= BB_BUY:
+        status, emoji, label = "BUY", "🟢", "컨트래리안 매수 (극단적 비관)"
+    else:
+        status, emoji, label = "NEUTRAL", "🟡", "중립 구간"
+    delta = ""
+    if isinstance(prev, (int, float)):
+        arrow = "↑" if val > prev else ("↓" if val < prev else "→")
+        delta = f" ({prev:.1f}{arrow}{val:.1f})"
+    return {"value": val, "prev": prev, "status": status, "emoji": emoji,
+            "label": label, "as_of": bb.get("as_of", "?"),
+            "note": bb.get("note", ""), "delta": delta}
+
+
 def evaluate() -> list:
     results = []
     # 수동 시그널
@@ -223,18 +252,22 @@ def evaluate() -> list:
 
 
 # ---------------------------------------------------------------- outputs
-def update_history(date_str: str, pct: int, results: list) -> list:
+def update_history(date_str: str, pct: int, results: list, bb: dict = None) -> list:
     hist = []
     if os.path.exists(HISTORY_PATH):
         with open(HISTORY_PATH, "r", encoding="utf-8") as f:
             hist = json.load(f)
     hist = [h for h in hist if h["date"] != date_str]
-    hist.append({
+    entry = {
         "date": date_str,
         "pct_triggered": pct,
         "signals": {r["id"]: r["triggered"] for r in results},
         "details": {r["id"]: r["value"] for r in results},
-    })
+    }
+    if bb:
+        entry["bull_bear"] = {"value": bb["value"], "status": bb["status"],
+                              "as_of": bb["as_of"]}
+    hist.append(entry)
     hist.sort(key=lambda h: h["date"])
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(HISTORY_PATH, "w", encoding="utf-8") as f:
@@ -247,7 +280,7 @@ def update_history(date_str: str, pct: int, results: list) -> list:
     return hist
 
 
-def build_message(date_str: str, results: list, pct: int) -> str:
+def build_message(date_str: str, results: list, pct: int, bb: dict = None) -> str:
     n_trig = sum(r["triggered"] for r in results)
     n_err = sum(r["error"] for r in results)
     if pct >= PEAK_AVG:
@@ -266,6 +299,22 @@ def build_message(date_str: str, results: list, pct: int) -> str:
         verdict,
         "",
     ]
+    if bb:
+        struct_red = pct >= PEAK_AVG
+        bb_red = bb["status"] == "SELL"
+        if struct_red and bb_red:
+            dual = "🔴🔴 <b>이중 확인</b> — 구조+센티먼트 동시 경고"
+        elif struct_red or bb_red:
+            dual = "🟠 <b>단일 경고</b> — 한 축만 점등"
+        else:
+            dual = "🟢 <b>이중 안정</b>"
+        lines += [
+            "🎯 <b>택티컬 오버레이</b> (Bull &amp; Bear)",
+            f"{bb['emoji']} <b>{bb['value']:.1f}</b>/10 {bb['status']}{bb['delta']}",
+            f"    <i>{_html.escape(bb['label'])} · as of {bb['as_of']}</i>",
+            dual,
+            "",
+        ]
     cat_prev = None
     for r in results:
         if r["category"] != cat_prev:
@@ -280,7 +329,7 @@ def build_message(date_str: str, results: list, pct: int) -> str:
             lines.append(f"    <i>{_html.escape(r['value'][:80])}</i>")
     lines += [
         "",
-        f"기준: BofA Exhibit 11 (피크 평균 ~{PEAK_AVG}%)",
+        f"기준: BofA Exhibit 11 (피크 평균 ~{PEAK_AVG}%) · B&amp;B는 독립 센티먼트 오버레이",
         "✍️ = 수동 시그널 (manual_signals.json)",
     ]
     if n_err:
@@ -303,8 +352,9 @@ def main():
     today = dt.date.today().isoformat()
     results = evaluate()
     pct = round(sum(r["triggered"] for r in results) / 10 * 100)
-    update_history(today, pct, results)
-    msg = build_message(today, results, pct)
+    bb = eval_bull_bear()
+    update_history(today, pct, results, bb)
+    msg = build_message(today, results, pct, bb)
     print(msg.replace("<b>", "").replace("</b>", "")
              .replace("<i>", "").replace("</i>", ""))
     if cfg["telegram_token"] and cfg["telegram_chat_id"]:

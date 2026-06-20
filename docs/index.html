@@ -43,13 +43,14 @@
 </head>
 <body>
   <h1>&#128202; Market Peak Signals</h1>
-  <div class="sub">BofA Exhibit 11 — 시장 피크 시그널 일일 모니터 (피크 평균 트리거율 ~70%)</div>
+  <div class="sub">BofA Exhibit 11 — 시장 피크 시그널 일일 모니터 (피크 평균 트리거율 ~70%) · Bull &amp; Bear 센티먼트 오버레이</div>
 
   <div class="grid">
     <div class="card"><div class="label">Triggered</div><div class="value" id="kpi-pct">—</div><div class="note" id="kpi-count"></div></div>
     <div class="card"><div class="label">판정</div><div class="value" id="kpi-verdict" style="font-size:1.15rem">—</div><div class="note">피크 평균 70% 기준</div></div>
     <div class="card"><div class="label">최근 변화</div><div class="value" id="kpi-delta">—</div><div class="note" id="kpi-delta-note"></div></div>
     <div class="card"><div class="label">업데이트</div><div class="value" id="kpi-date" style="font-size:1.15rem">—</div><div class="note">매일 07:30 KST</div></div>
+    <div class="card" id="card-bb" style="display:none"><div class="label">Bull &amp; Bear (택티컬)</div><div class="value" id="kpi-bb" style="font-size:1.3rem">—</div><div class="note" id="kpi-bb-note">BofA 센티먼트 · ≥8 매도 / ≤2 매수</div></div>
   </div>
 
   <div class="panel">
@@ -115,30 +116,44 @@ function render(hist){
   }
   document.getElementById("kpi-date").textContent = latest.date;
 
+  // Bull & Bear 택티컬 오버레이 카드
+  if(latest.bull_bear){
+    const bb = latest.bull_bear;
+    const el = document.getElementById("kpi-bb");
+    document.getElementById("card-bb").style.display = "";
+    el.textContent = bb.value.toFixed(1) + " / 10 · " + bb.status;
+    el.style.color = bb.status==="SELL" ? "var(--red)"
+                   : (bb.status==="BUY" ? "var(--green)" : "var(--orange)");
+    document.getElementById("kpi-bb-note").textContent =
+      "as of " + bb.as_of + " · ≥8 매도 / ≤2 매수";
+  }
+
+  const bbSeries = hist.map(h => h.bull_bear ? h.bull_bear.value : null);
+  const hasBB = bbSeries.some(v => v !== null);
+  const trendDatasets = [
+    { label:"% triggered (구조)", data: hist.map(h=>h.pct_triggered),
+      borderColor:"#58a6ff", backgroundColor:"rgba(88,166,255,.12)",
+      fill:true, tension:.25, pointRadius:3, yAxisID:"y" },
+    { label:"피크 평균 (70%)", data: hist.map(()=>70),
+      borderColor:"rgba(248,81,73,.55)", borderDash:[6,5],
+      pointRadius:0, fill:false, yAxisID:"y" },
+  ];
+  if(hasBB){
+    trendDatasets.push({ label:"Bull & Bear (센티먼트)", data: bbSeries,
+      borderColor:"#d29922", backgroundColor:"rgba(210,153,34,.10)",
+      fill:false, tension:.25, pointRadius:3, spanGaps:true, yAxisID:"y1" });
+  }
   new Chart(document.getElementById("trend"), {
     type: "line",
-    data: {
-      labels: hist.map(h=>h.date),
-      datasets: [
-        {
-          label: "% triggered",
-          data: hist.map(h=>h.pct_triggered),
-          borderColor: "#58a6ff", backgroundColor: "rgba(88,166,255,.12)",
-          fill: true, tension: .25, pointRadius: 3,
-        },
-        {
-          label: "피크 평균 (70%)",
-          data: hist.map(()=>70),
-          borderColor: "rgba(248,81,73,.55)", borderDash: [6,5],
-          pointRadius: 0, fill: false,
-        }
-      ]
-    },
+    data: { labels: hist.map(h=>h.date), datasets: trendDatasets },
     options: {
       plugins: { legend: { labels:{color:"#8b949e"} } },
       scales: {
-        y: { min:0, max:100, ticks:{color:"#8b949e", callback:v=>v+"%"}, grid:{color:"#21262d"} },
-        x: { ticks:{color:"#8b949e", maxTicksLimit:12}, grid:{display:false} }
+        y:  { min:0, max:100, position:"left",
+              ticks:{color:"#8b949e", callback:v=>v+"%"}, grid:{color:"#21262d"} },
+        y1: { min:0, max:10, position:"right", display:hasBB,
+              ticks:{color:"#d29922"}, grid:{drawOnChartArea:false} },
+        x:  { ticks:{color:"#8b949e", maxTicksLimit:12}, grid:{display:false} }
       }
     }
   });

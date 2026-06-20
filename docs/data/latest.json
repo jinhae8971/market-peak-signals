@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-06-19T23:37:36.388495+00:00",
+ "generated_at": "2026-06-20T08:34:43.028584+00:00",
  "date": "2026-06-20",
  "pct_triggered": 70,
  "signals": {
@@ -25,5 +25,10 @@
   "S8": "10Y-3M now +0.87%, 6m min +0.38%",
   "S9": "HYG/LQD 0.7336, stress proxy 0.01",
   "S10": "manual fallback (as of 2026-04)"
+ },
+ "bull_bear": {
+  "value": 9.2,
+  "status": "SELL",
+  "as_of": "2026-06"
  }
 }
