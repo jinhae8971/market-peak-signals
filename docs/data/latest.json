@@ -1,14 +1,14 @@
 {
- "generated_at": "2026-07-15T23:30:07.818264+00:00",
- "date": "2026-07-16",
- "pct_triggered": 70,
+ "generated_at": "2026-07-16T23:26:44.461131+00:00",
+ "date": "2026-07-17",
+ "pct_triggered": 60,
  "signals": {
   "S1": false,
   "S2": true,
   "S3": false,
   "S4": true,
   "S5": true,
-  "S6": true,
+  "S6": false,
   "S7": true,
   "S8": false,
   "S9": true,
@@ -20,10 +20,10 @@
   "S3": "BofA SSI — Sell 신호 미발동 (as of 2026-05)",
   "S4": "LTG 5y Z > 1 (as of 2026-05)",
   "S5": "M&A 건수 10y Z > 1 (as of 2026-05)",
-  "S6": "Z=2.10 (PE 32.6 + CPI 3.9%)",
-  "S7": "Value-Growth 6m -4.1ppt",
-  "S8": "10Y-3M now +0.86%, 6m min +0.38%",
-  "S9": "HYG/LQD 0.7419, stress proxy 0.00",
+  "S6": "ERROR: ReadTimeout: HTTPSConnectionPool(host='api.bls.gov', port=443): Read timed out. (read timeout=30)",
+  "S7": "Value-Growth 6m -2.9ppt",
+  "S8": "10Y-3M now +0.87%, 6m min +0.38%",
+  "S9": "HYG/LQD 0.7423, stress proxy 0.00",
   "S10": "manual fallback (as of 2026-04)"
  },
  "bull_bear": {
