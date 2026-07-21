@@ -1418,5 +1418,38 @@
    "status": "SELL",
    "as_of": "2026-06"
   }
+ },
+ {
+  "date": "2026-07-22",
+  "pct_triggered": 70,
+  "signals": {
+   "S1": false,
+   "S2": true,
+   "S3": false,
+   "S4": true,
+   "S5": true,
+   "S6": true,
+   "S7": true,
+   "S8": false,
+   "S9": true,
+   "S10": true
+  },
+  "details": {
+   "S1": "CB Consumer Confidence — 110 미만 (as of 2026-05)",
+   "S2": "CB 주가상승 기대 Net% > 20 (as of 2026-05)",
+   "S3": "BofA SSI — Sell 신호 미발동 (as of 2026-05)",
+   "S4": "LTG 5y Z > 1 (as of 2026-05)",
+   "S5": "M&A 건수 10y Z > 1 (as of 2026-05)",
+   "S6": "Z=1.26 (PE 28.9 + CPI 3.9%)",
+   "S7": "Value-Growth 6m -4.2ppt",
+   "S8": "10Y-3M now +0.90%, 6m min +0.38%",
+   "S9": "HYG/LQD 0.7454, stress proxy 0.00",
+   "S10": "manual fallback (as of 2026-04)"
+  },
+  "bull_bear": {
+   "value": 9.2,
+   "status": "SELL",
+   "as_of": "2026-06"
+  }
  }
 ]
