@@ -1,14 +1,14 @@
 {
- "generated_at": "2026-08-09T23:00:36.572725+00:00",
- "date": "2026-08-10",
- "pct_triggered": 60,
+ "generated_at": "2026-08-10T23:07:27.398020+00:00",
+ "date": "2026-08-11",
+ "pct_triggered": 70,
  "signals": {
   "S1": false,
   "S2": true,
   "S3": false,
   "S4": true,
   "S5": true,
-  "S6": false,
+  "S6": true,
   "S7": true,
   "S8": false,
   "S9": true,
@@ -20,10 +20,10 @@
   "S3": "BofA SSI — Sell 신호 미발동 (as of 2026-05)",
   "S4": "LTG 5y Z > 1 (as of 2026-05)",
   "S5": "M&A 건수 10y Z > 1 (as of 2026-05)",
-  "S6": "ERROR: HTTPError: 503 Server Error: Service Unavailable for url: https://api.bls.gov/publicAPI/v2/timeseries/data/",
-  "S7": "Value-Growth 6m -10.4ppt",
-  "S8": "10Y-3M now +0.95%, 6m min +0.38%",
-  "S9": "HYG/LQD 0.7472, stress proxy 0.00",
+  "S6": "Z=1.51 (PE 29.9 + CPI 3.9%)",
+  "S7": "Value-Growth 6m -8.4ppt",
+  "S8": "10Y-3M now +0.98%, 6m min +0.38%",
+  "S9": "HYG/LQD 0.7501, stress proxy 0.00",
   "S10": "manual fallback (as of 2026-04)"
  },
  "bull_bear": {
