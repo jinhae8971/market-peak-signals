@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-09-12T00:29:30.521753+00:00",
- "date": "2026-09-12",
+ "generated_at": "2026-09-13T00:09:26.906403+00:00",
+ "date": "2026-09-13",
  "pct_triggered": 60,
  "signals": {
   "S1": false,
@@ -21,9 +21,9 @@
   "S4": "LTG 5y Z > 1 (as of 2026-05)",
   "S5": "M&A 건수 10y Z > 1 (as of 2026-05)",
   "S6": "Z=0.51 (PE 26.2 + CPI 3.7%)",
-  "S7": "Value-Growth 6m -6.5ppt",
+  "S7": "Value-Growth 6m -7.6ppt",
   "S8": "10Y-3M now +1.06%, 6m min +0.60%",
-  "S9": "HYG/LQD 0.7534, stress proxy 0.00",
+  "S9": "HYG/LQD 0.7535, stress proxy 0.00",
   "S10": "manual fallback (as of 2026-04)"
  },
  "bull_bear": {
