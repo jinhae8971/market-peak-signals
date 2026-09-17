@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-09-16T00:41:18.150560+00:00",
- "date": "2026-09-16",
+ "generated_at": "2026-09-17T00:47:54.669589+00:00",
+ "date": "2026-09-17",
  "pct_triggered": 60,
  "signals": {
   "S1": false,
@@ -20,10 +20,10 @@
   "S3": "BofA SSI — Sell 신호 미발동 (as of 2026-05)",
   "S4": "LTG 5y Z > 1 (as of 2026-05)",
   "S5": "M&A 건수 10y Z > 1 (as of 2026-05)",
-  "S6": "Z=0.44 (PE 25.9 + CPI 3.7%)",
-  "S7": "Value-Growth 6m -6.2ppt",
+  "S6": "Z=0.41 (PE 25.8 + CPI 3.7%)",
+  "S7": "Value-Growth 6m -6.1ppt",
   "S8": "10Y-3M now +1.04%, 6m min +0.60%",
-  "S9": "HYG/LQD 0.7529, stress proxy 0.00",
+  "S9": "HYG/LQD 0.7516, stress proxy 0.00",
   "S10": "manual fallback (as of 2026-04)"
  },
  "bull_bear": {
